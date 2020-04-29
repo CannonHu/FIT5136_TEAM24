@@ -1,0 +1,64 @@
+.modal-mask {
+	background-color: rgba(0, 0, 0, .5);
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	top: 0;
+	left: 0;
+	z-index: 99;
+	display: flex;
+	justify-content: center;
+}
+
+.modal-container {
+	background-color: white;
+	width: 25rem;
+	margin: auto;
+}
+
+.modal-header {
+	padding: 0.7rem 1.3rem 0 1.3rem;
+	border: none;
+}
+
+.modal-header h3{
+    margin-top: 0;
+    color:#1363b4;
+	font-weight: 600;
+	font-size: 1.5rem;
+}
+
+.modal-body {
+	padding: 0.2rem 0.5rem 0.2rem 0.5rem;
+	text-align: center;
+}
+
+.modal-body p {
+	color: #666666;
+	margin: 0;
+}
+
+.modal-footer {
+	border: none;
+	margin: 1rem 0.5rem 0.4rem 0.5rem;
+	padding: 0;
+}
+
+.modal-footer button {
+	border: none;
+	padding: 0rem 0.6rem 0.2rem 0.6rem;
+	margin-right: 0.4rem;
+}
+
+.modal-footer .modal-default-button {
+	background-color: #1363b4;
+	color: white;
+}
+
+.modal-footer .modal-common-button{
+	border: none;
+	background-color: white;
+	color:#1363b4;
+	font-weight: 600;
+}
+
