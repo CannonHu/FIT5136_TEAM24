@@ -1,66 +1,18 @@
-@keyframes fade-from-top {
-  from {
-    opacity: 0;
-    transform: translate3d(0, -15%, 0);
-  }
-
-  to {
-    opacity: 1;
-    transform: none;
-  }
+p {
+	margin-bottom: 0;
 }
-
-@keyframes fade-from-left {
-	from {
-	  opacity: 0;
-	  transform: translate3d(-40%, 0, 0);
-	}
-	
-	80% {
-		opacity: 0.9;
-		transform: translate3d(5%, 0, 0);
-	}
-	
-	to {
-	  opacity: 1;
-	  transform: none;
-	}
-}
-
-@keyframes fade-from-bottom {
-	from {
-	  opacity: 0;
-	  transform: translate3d(0, 25%, 0);
-	}
-	
-	to {
-		opacity: 1;
-		transform: none;
-	}
-}
-
-body {	
-	background-color: black;
-	text-align: center;
-	background-image: url(../img/BG.jpg);
-	background-repeat: no-repeat;
-	background-size: 100%;
-	color: white;
-	font-family: Helvetica, Arial, sans-serif;
-}
-
 
 #MainPage {
 	width: 100%;
 	overflow: auto;
 	position: relative;
-	
+	text-align: center;
 }
 
 #WelcomeHeader {
-	width: 68rem;
-	margin-left: 7rem;
-	margin-top: 10%;
+	width: 60rem;
+	margin-left: 4.5rem;
+	margin-top: 8%;
 	
 	animation-duration: 1.4s;
 	animation-fill-mode: both;
@@ -68,20 +20,21 @@ body {
 }
 
 #WelcomeHeader h1 {
-	font-size: 4.2rem;
+	font-size: 4rem;
 }
 
 #WelcomeHeader h2 {
-	font-size: 3.4rem;
+	font-size: 3.2rem;
 	font-style: italic;
 	margin-left: 50%;
 	margin-top: -1rem;
 }
 
 #Introduction {
-	width: 58rem;
-	margin-left: 12rem;
-	margin-top: 2.5rem;
+	width: 75%;
+	margin-left: 6rem;
+	margin-top: 3rem;
+	margin-bottom: 4.2rem;
 	text-align: left;
 }
 
@@ -92,9 +45,11 @@ body {
 	animation-name: fade-from-left;
 }
 
-#Introduction p {
+
+
+#Introduction div {
 	margin-top: 1rem;
-	margin-left: 1.2rem;
+	margin-left: 0.5rem;
 	font-size: 1.3rem;
 	font-style: italic;
 	
@@ -107,37 +62,57 @@ body {
 	font-style: normal;
 	text-decoration: underline;
 	color: #DBDFDF;
-	margin-left: 1.5rem;
+	margin-left: 1.3rem;
+	marin-top: 0.2rem;
 	cursor: pointer;
+	
 }
 
-.dropfade-enter-active {
-	animation: fade-from-top 0.7s;
+#OptionsArea {
+	display: flex;
+	width: 21rem;
+	justify-content: space-between;
+	margin: 0 auto;
+	animation-fill-mode: both;
+	animation-name: fade-from-bottom;
 }
 
-.dropfade-leave-active {
-	animation: fade-from-top 0.3s reverse;
+.main-bottom {
+	width: 9.5rem;
+	height: 3rem;
+	font-size: 1.4rem;
+	line-height: 2.7rem;
+	border-radius: 1rem;
+	border-style: solid;
+	border-width: 2px;
+	cursor: pointer;
+	
 }
-/*
-.drop-fade-enter-active {
-  transition: all .3s ease;
-}
-.drop-fade-leave-active {
-  transition: all .8s cubic-bezier(1.0, 0.5, 0.8, 1.0);
-}
-.drop-fade-enter, .slide-fade-leave-to
-{
-  transform: translateX(10px);
-  opacity: 0;
-}*/
 
-@media screen and (max-width: 1200px) {
-	body {
-		background-size: 75rem;
-		width: 75rem;
+.home-default-bottom {
+	background-color: white;
+	color: black;
+	border-color: white;
+}
+
+.home-default-bottom:hover {
+	background-color: #DBDFDF;
+}
+
+.home-optional-bottom {
+	background-color: black;
+	color: white;
+	border-color: white;
+}
+
+.home-optional-bottom:hover {
+	background-color: #333333;
+}
+
+@media screen and (max-width: 1080px) {
+	#Introduction {
+		width: 56rem;
 	}
-	
-	
 }
 
 

@@ -5,7 +5,8 @@
         <title>EmployFast - Mission to Mars</title>
         <script src="js/vue.min.js"> </script>
 		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-        <link rel="stylesheet" type="text/css" href="css/home.css">
+        <link rel="stylesheet" type="text/css" href="css/basic.css">
+		<link rel="stylesheet" type="text/css" href="css/home.css">
 		<link rel="stylesheet" type="text/css" href="css/modal.css">
     </head>
 	
@@ -17,25 +18,35 @@
 			</div>
 			<div id="Introduction">
 				<h3> What is it for?</h3>			
-				<p :key="IntroShow" v-bind:style="NewPage ? introContentAppearAnimation : introContentNodelayAnimation">
-					<span>
-						{{ IntroShow ? IntroAll : IntroSimplified}}
-					</span>
-					<span v-if="IntroShow">
-						<b>create a mission</b> (for Mission Coordinators); 
-						<b>select a space shuttle</b> (for Administrator); 
-						<b>select candidates</b> (for Administrator and Mission Coordinators); 
-						<b>register as a candidate</b> (for Candidates).
-					</span>
-					<br>
-					<span id="ShowHideOption" v-on:click="IntroShowStatusSwitch">
+				<div :key="IntroShow" v-bind:style="NewPage ? introContentAppearAnimation : introContentNodelayAnimation">
+					<div v-if="IntroShow">
+						<span>
+							Initiate Second Chance Cooperation (ISCC) is responsible for collaborating with the government of many countries to run space exploration missions. <br> A space exploration mission can originates from a country and take candidate from other countries. This employ system is to help organize the exploration missions to mars. The functions provided includes: 
+						</span>
+						<br>
+						<ul>
+							<li><b>Create a mission</b> (for Mission Coordinators)
+							<li><b>Select a space shuttle</b> (for Administrator)
+							<li><b>Select candidates</b> (for Administrator and Mission Coordinators)
+							<li><b>Register as a candidate</b> (for Candidates)
+						</ul>
+					</div>
+					<div v-else>
+						<p>Initiate Second Chance Cooperation (ISCC) is responsible for collaborating with the government of many countries to run space exploration missions...</p>
+					</div>
+					<p id="ShowHideOption" v-on:click="IntroShowStatusSwitch">
 						{{ IntroShow ? IntroShowBottom : IntroHideBottom }}
-					</span>				
-				</p>				
+					</p>				
+				</div>				
 			</div>
 			
-			<div id="OptionsArea">
-				
+			<div id="OptionsArea" :key="IntroShow" v-bind:style="NewPage ? bottomsAppearAnimation : bottomsNodelayAnimation">
+				<div class="main-bottom home-default-bottom">
+					LOG IN
+				</div>
+				<div class="main-bottom home-optional-bottom">
+					REGISTER
+				</div>
 			</div>
 		</div>
 	</body>
@@ -56,16 +67,25 @@
 				
 				
 				IntroShow : false, 
-				IntroAll : 'Initiate Second Chance Cooperation (ISCC) is responsible for collaborating with the government of many countries to run space exploration missions. A space exploration mission can originates from a country and take candidate from other countries. This employ system is to help organize the exploration missions to mars. The functions provided includes: ', 
-				IntroSimplified: 'Initiate Second Chance Cooperation (ISCC) is responsible for collaborating with the government of many countries to run space exploration missions...',
 				IntroShowBottom: 'Hide', 
-				IntroHideBottom: 'Show All'
+				IntroHideBottom: 'Show All', 
+				
+				bottomsAppearAnimation: {
+					'animation-delay': '1.4s', 
+					'animation-duration': '1s'
+				}, 
+				bottomsNodelayAnimation: {
+					'animation-delay': '0.4s', 
+					'animation-duration': '1s'
+				}, 
+			}, 
+			computed: {
 			}, 
 			methods: {
 				IntroShowStatusSwitch:function() {
 					//console.log(this.IntroShow);
-					this.IntroShow = !this.IntroShow;
-					this.NewPage = false;
+					this.IntroShow = !this.IntroShow
+					this.NewPage = false
 				}
 			}
 		})
