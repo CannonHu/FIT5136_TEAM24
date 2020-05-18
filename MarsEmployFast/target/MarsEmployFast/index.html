@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>EmployFast - Mission to Mars</title>
+        <script src="js/vue.min.js"> </script>
+        <link rel="stylesheet" type="text/css" href="css/basic.css">
+		<link rel="stylesheet" type="text/css" href="css/home.css">
+		<link rel="stylesheet" type="text/css" href="css/modal.css">
+    </head>
+	
+	<body>
+		<div id="MainPage">
+			<div id="WelcomeHeader">
+				<h1>Welcome to Employ System</h1>
+				<h2>for <b>Mission to Mars</b></h2>
+			</div>
+			<div id="Introduction">
+				<h3> What is it for?</h3>			
+				<div :key="IntroShow" v-bind:style="NewPage ? introContentAppearAnimation : introContentNodelayAnimation">
+					<div v-if="IntroShow">
+						<span>
+							Initiate Second Chance Cooperation (ISCC) is responsible for collaborating with the government of many countries to run space exploration missions. <br> A space exploration mission can originates from a country and take candidate from other countries. This employ system is to help organize the exploration missions to mars. The functions provided includes: 
+						</span>
+						<br>
+						<ul>
+							<li><b>Create a mission</b> (for Mission Coordinators)
+							<li><b>Select a space shuttle</b> (for Administrator)
+							<li><b>Select candidates</b> (for Administrator and Mission Coordinators)
+							<li><b>Register as a candidate</b> (for Candidates)
+						</ul>
+					</div>
+					<div v-else>
+						<p>Initiate Second Chance Cooperation (ISCC) is responsible for collaborating with the government of many countries to run space exploration missions...</p>
+					</div>
+					<p id="ShowHideOption" v-on:click="IntroShowStatusSwitch">
+						{{ IntroShow ? IntroShowBottom : IntroHideBottom }}
+					</p>				
+				</div>				
+			</div>
+			
+			<div id="OptionsArea" :key="IntroShow" v-bind:style="NewPage ? bottomsAppearAnimation : bottomsNodelayAnimation">
+				<div class="main-bottom home-default-bottom" v-on:click="OpenLoginPage">
+					LOG IN
+				</div>
+				<div class="main-bottom home-optional-bottom">
+					REGISTER
+				</div>
+			</div>
+		</div>
+	</body>
+	
+	<script>
+		new Vue({
+			el: '#MainPage',
+			data: {
+				NewPage : true,
+				introContentAppearAnimation: {
+					'animation-delay': '1s', 
+					'animation-duration': '1s'
+				}, 
+				introContentNodelayAnimation: {
+					'animation-delay': '0s', 
+					'animation-duration': '1.2s'
+				}, 
+				
+				
+				IntroShow : false, 
+				IntroShowBottom: 'Hide', 
+				IntroHideBottom: 'Show All', 
+				
+				bottomsAppearAnimation: {
+					'animation-delay': '1.4s', 
+					'animation-duration': '1s'
+				}, 
+				bottomsNodelayAnimation: {
+					'animation-delay': '0.4s', 
+					'animation-duration': '1s'
+				}, 
+			}, 
+			computed: {
+			}, 
+			methods: {
+				IntroShowStatusSwitch:function() {
+					//console.log(this.IntroShow);
+					this.IntroShow = !this.IntroShow
+					this.NewPage = false
+				},
+				OpenLoginPage:function() {
+					window.open('login.html');
+				}
+			}
+		})
+	</script>
+</html>
