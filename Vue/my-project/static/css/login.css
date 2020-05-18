@@ -1,0 +1,115 @@
+#LoginFrame {
+	width: 48rem;
+	height: 27rem;
+	margin: auto;
+	margin-top: 4rem;
+	position: relative;
+
+	z-index: 1;
+	overflow: hidden;
+	border-style: solid;
+}
+
+#LoginFrame, #LoginFrame .rb-blacken-layer {
+	border-radius: 1.5rem;
+}
+
+#LoginFrame:after {
+	content: '';
+
+	background-repeat: no-repeat;
+	background-size: cover;
+	background-attachment: fixed;
+	filter: blur(4px);
+	z-index: -1;
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+}
+
+.frame-title {
+	width: 88%;
+	margin: auto;
+	text-align: left;
+	padding-bottom: 0.6rem;
+}
+
+.frame-title h1 {
+	font-size: 2.4rem;
+	padding-top: 1.2rem;
+	padding-bottom: 0.5rem;
+	margin-left: 1.5rem;
+	margin-top: 0;
+	margin-bottom: 0;
+}
+
+.login-info-box {
+	margin-top: 0.8rem;
+}
+
+.login-input-line {
+	display: flex;
+	align-items: center;
+}
+
+.input-notice {
+	width: 8rem;
+	font-size: 1rem;
+	padding-bottom: 0.2rem;
+}
+
+.input-attr-name {
+	width: 7.6rem;
+	padding-bottom: 0.2rem;
+}
+
+.input-attr-name p {
+	font-size: 1.7rem;
+	margin: 0;
+}
+
+.login-input-line .input-box {
+	margin-top: -0.2rem;
+	margin-left: 1.5rem;
+
+	padding-bottom: 0.2rem;
+	padding-left: 0.2rem;
+	padding-right: 0.1rem;
+}
+
+.login-input-line input {
+	width: 16rem;
+	font-size: 1.4rem;
+	font-style: normal;
+	letter-spacing: 0.05rem;
+	border-style: none;
+}
+
+.login-input-line input:placeholder-shown {
+  text-indent: 0.25rem;
+	font-style: italic;
+	letter-spacing: 0.07rem;
+}
+
+.main-bottom {
+	width: 9.5rem;
+	height: 2.6rem;
+	font-size: 1.45rem;
+	line-height: 2.6rem;
+	cursor: pointer;
+
+	margin:auto;
+	margin-top: 2rem;
+}
+
+.main-bottom:hover {
+	font-weight: bold;
+}
+
+@media screen and (max-width: 1080px) {
+	#LoginFrame:after {
+		background-size: 67.5rem;
+	}
+}

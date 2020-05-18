@@ -1,0 +1,128 @@
+#LoginFrame {
+	width: 48rem;
+	height: 27rem;
+	margin: auto;
+	margin-top: 4rem;
+	position: relative;
+	
+	z-index: 1;
+	overflow: hidden;
+	border-color: rgba(240, 248, 255, 0.8);
+	border-style: solid;
+}
+
+#LoginFrame, #LoginFrame .rb-blacken-layer {
+	border-radius: 1.5rem;
+}
+
+#LoginFrame:after {
+	content: '';
+	background-image: url(../img/BG.jpg);
+	background-repeat: no-repeat;
+	background-size: cover;
+	background-attachment: fixed;
+	filter: blur(4px);
+	z-index: -1;
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+}
+
+.login-info-box {
+	margin-top: 0.8rem;
+}
+
+.login-input-line {
+	display: flex;
+	align-items: center;
+}
+
+.input-notice {
+	width: 8rem;
+	color:rgb(183, 54, 10);
+	font-size: 1rem;
+	padding-bottom: 0.2rem;
+}
+
+.input-attr-name {
+	width: 7.6rem;
+	padding-bottom: 0.2rem;
+}
+
+.input-attr-name p {
+	font-size: 1.7rem;
+	margin: 0;
+}
+
+.login-input-line .input-box {
+	margin-top: -0.2rem;
+	margin-left: 1.5rem;
+	border-bottom: solid 0.1rem #F0F8FF;
+	padding-bottom: 0.2rem;
+	padding-left: 0.2rem;
+	padding-right: 0.1rem;
+}
+
+.login-input-line input {
+	width: 16rem;
+	font-size: 1.4rem;
+	font-style: normal;
+	letter-spacing: 0.05rem;
+	background-color: rgba(0, 0, 0, 0);
+	border-style: none;
+	color: aliceblue
+}
+
+.login-input-line input:placeholder-shown {
+	font-style: italic;
+	letter-spacing: 0.07rem;
+}
+
+.signin-bottom {
+	width: 9.5rem;
+	height: 2.6rem;
+	font-size: 1.45rem;
+	line-height: 2.6rem;
+	cursor: pointer;
+	background-color: #000000;
+	border-color: aliceblue;
+	border-style: solid;
+	border-width: 1px;
+	margin:auto;
+	margin-top: 2rem;
+}
+
+.signin-bottom:hover {
+	background-color: white;
+	color: rgb(0, 27, 48);
+	border-color: rgb(0, 27, 48);
+	font-weight: bold;
+}
+
+#signup-box {
+	color:aliceblue;
+	font-size: 1.2rem;
+	letter-spacing: 0.05rem;
+	margin-top: 0.7rem;
+	padding-left: 0.1rem;
+	padding-right: 0.1rem;
+	cursor: pointer;
+}
+
+#signup-box span {
+	border-bottom: aliceblue 1px solid;
+}
+
+#signup-box :hover {
+	color:#666666;
+	border-bottom: #666666 1px solid;
+}
+
+@media screen and (max-width: 1080px) {
+	#LoginFrame:after {
+		background-size: 67.5rem;
+	}
+}
+
