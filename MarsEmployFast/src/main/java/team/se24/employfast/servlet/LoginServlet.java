@@ -2,16 +2,18 @@ package team.se24.employfast.servlet;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import team.se24.employfast.service.MarsEmployFast;
 import team.se24.employfast.service.Salt;
+import team.se24.employfast.service.UserVerify;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.*;
 import java.io.IOException;
 import java.io.PrintWriter;
 
 public class LoginServlet extends HttpServlet {
+    private static MarsEmployFast employSystem = new MarsEmployFast();
+
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         req.setCharacterEncoding("utf-8");
@@ -28,17 +30,27 @@ public class LoginServlet extends HttpServlet {
         }
 
         switch(reqType) {
-            case "salt":
-                System.out.println("Get Salt Request");
+            case "salt": {
+                HttpSession saltSession = req.getSession(true);
+
                 Salt loginSalt = new Salt();
+                saltSession.setAttribute("dynamicSalt", loginSalt.getDynamicSaltVal());
+                saltSession.setMaxInactiveInterval(60);
+                System.out.println(saltSession.getId());
                 writer.write(mapper.writeValueAsString(loginSalt));
                 break;
-            case "verify":
-                String user = req.getParameter("username");
-                String hashed = req.getParameter("hashed");
+            }
+            case "verify": {
+                HttpSession saltSession = req.getSession();
+                String inputUser = req.getParameter("username");
+                String inputPasswd = req.getParameter("passwd");
 
-                
-                break;
+                String dSalt = null;
+                if ((dSalt = (String)saltSession.getAttribute("dynamicSalt")) != null ) {
+
+                }
+            }
+
         }
         writer.close();
     }

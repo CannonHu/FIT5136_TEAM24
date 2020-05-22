@@ -1,11 +1,9 @@
-package team.se24.employfast.service;
+package com.spg.csv;
 
 import java.net.URISyntaxException;
 import java.security.MessageDigest;
 import java.util.List;
 import java.util.Map;
-
-import com.spg.csv.CSVFileDatabase;
 
 public class UserVerify {
     private CSVFileDatabase adminAuthDb;
@@ -29,16 +27,16 @@ public class UserVerify {
         public Map<String, String> search(String username) {
             userRecord = null;
             threads[0] = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    if (userRecord == null) {
-                        List<Map<String, String>> records = adminAuthDb.searchRecord("username", username);
-                        if (records != null) {
-                            userRecord = records.get(0);
-                            interuptOtherThreads(threads[0]);
-                        }
-                    }
-                }
+               @Override
+               public void run() {
+                   if (userRecord == null) {
+                       List<Map<String, String>> records = adminAuthDb.searchRecord("username", username);
+                       if (records != null && records.size() != 0) {
+                           userRecord = records.get(0);
+                           interuptOtherThreads(threads[0]);
+                       }
+                   }
+               }
             });
 
             threads[1] = new Thread(new Runnable() {
@@ -46,7 +44,7 @@ public class UserVerify {
                 public void run() {
                     if (userRecord == null) {
                         List<Map<String, String>> records = coordinateAuthDb.searchRecord("username", username);
-                        if (records != null) {
+                        if (records != null && records.size() != 0) {
                             userRecord = records.get(0);
                             interuptOtherThreads(threads[1]);
                         }
@@ -59,7 +57,7 @@ public class UserVerify {
                 public void run() {
                     if (userRecord == null) {
                         List<Map<String, String>> records = candidateAuthDb.searchRecord("username", username);
-                        if (records != null) {
+                        if (records != null && records.size() != 0) {
                             userRecord = records.get(0);
                             interuptOtherThreads(threads[2]);
                         }
@@ -111,6 +109,7 @@ public class UserVerify {
 
     public UserVerify(Map<String, String> csvDbs) throws URISyntaxException {
         String basePath = UserVerify.class.getClassLoader().getResource("").toURI().getPath();
+        basePath = basePath.substring(0, basePath.length() - 8);
         String targetDir = "data/user/";
 
         if (csvDbs.size() != 3) {

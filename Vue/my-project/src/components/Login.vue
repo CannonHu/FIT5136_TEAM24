@@ -1,3 +1,4 @@
+
 <template>
   <div id="LoginFrame">
   	<div class="rb-blacken-layer">
@@ -39,6 +40,7 @@
 </template>
 
 <script>
+	import { hex_sha256 } from '../js/sha256.js'
   export default {
     name: 'LoginFrame',
     data: function() {
@@ -53,17 +55,25 @@
 
     },
     methods: {
-    	GetSalt:function() {
-        this.$axios.post('/MarsEmployFast/signin', {
-          type: 'salt'
-        }).then((resp) => {
-    				this.dynamicSaltValue = resp.data.dynamicSaltVal
-    				this.staticSaltValue = resp.data.staticSaltVal
-    			  console.log("dynamicSaltValue", this.dynamicSaltValue);
-    				console.log("staticSaltValue", this.staticSaltValue);
-    		}).catch((error) => {
-          console.log(error)
-        })
+    	LoginVerify:function() {
+			this.$axios.post('/MarsEmployFast/signin', {
+			  type: 'salt'
+			}).then((resp) => {
+				console.log("passwdHashed", hex_sha256(this.passwdValue))
+				var hashed = hex_sha256(hex_sha256(this.passwdValue + this.staticSaltValue) + this.dynamicSaltValue)
+				console.log("hashedResult", hashed)
+				this.$axios.post('/MarsEmployFast/signin', {
+					type: 'verify',
+					username: this.usernameValue,
+					passwd: hashed
+				}).then((resp) => {
+							
+				}).catch((error) => {
+					console.log(error)
+				})
+				}).catch((error) => {
+			  console.log(error)
+			})
     	},
     	LoginCheck:function() {
     		this.usernameCheck = this.passwordCheck = ''
@@ -73,9 +83,9 @@
     		else if (this.passwdValue == '') {
     			this.passwordCheck = 'cannot be blank'
     		}
-        else {
-          this.GetSalt();
-        }
+			else {
+				this.LoginVerify();
+			}
     	}
     }
   }

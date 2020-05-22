@@ -1,1 +1,0 @@
-function test_func(a) { return a + 5 }
