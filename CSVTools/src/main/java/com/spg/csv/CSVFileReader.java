@@ -1,3 +1,5 @@
+package com.spg.csv;
+
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
 import com.opencsv.exceptions.CsvValidationException;
@@ -14,7 +16,7 @@ public class CSVFileReader {
 
     public String[] getHeader() throws RuntimeException {
         if (attributes == null) {
-            throw new RuntimeException("CSVFileReader Constructor Implementation Error");
+            throw new RuntimeException("com.spg.csv.CSVFileReader Constructor Implementation Error");
         }
         return attributes;
     }
@@ -137,7 +139,7 @@ public class CSVFileReader {
 
         File csvFile = new File(filePath);
         try {
-            reader = new CSVReader(new InputStreamReader(new FileInputStream(csvFile), "utf-8"));
+            reader = new CSVReader(new BufferedReader(new InputStreamReader(new FileInputStream(csvFile), "utf-8")));
             attributes = reader.readNext();
             if (attributes == null) {
                 throw new Exception("The Attributes Declaration line should not be blank");
@@ -176,7 +178,7 @@ public class CSVFileReader {
 
         File csvFile = new File(filePath);
         try {
-            reader = new CSVReader(new InputStreamReader(new FileInputStream(csvFile), "utf-8"));
+            reader = new CSVReader(new BufferedReader(new InputStreamReader(new FileInputStream(csvFile), "utf-8")));
         }
         catch(FileNotFoundException e) {
             System.out.println(e.toString() + ":\nThe File Path " + filePath + " is invalid");
