@@ -7,14 +7,22 @@ import java.util.*;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class CSVFileDatabase {
+    private final static int defaultBufLen = 1024;
+    private final static int defaultAppendBufLen = 384;
+
     private ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+
     private String[] attributes;
     private Map<String, Integer> attrMap;
+
     private List<String[]> csvLines;
     private long setBufLen;
-    private final static int defaultBufLen = 1024;
     private long bufFirstLineNum = 0;
     private boolean complete = false;
+
+    private List<String[]> appendLines;
+    private long setAppendBufLen;
+
     private String filePath;
     private CSVFileReader reader;
     private CSVFileWriter writer;
@@ -30,109 +38,116 @@ public class CSVFileDatabase {
         return index;
     }
 
+    private Map<String, String> strArray2RecordMap(String[] valArray) throws Exception {
+        HashMap<String, String> record = new HashMap<String, String>();
+        if (valArray.length != attributes.length) {
+            throw new IllegalArgumentException("The Record Value String Array is INVALID. Provided Value Numbers is " + valArray.length + " Required: " + attributes.length);
+        }
+
+        for (int i = 0; i < attributes.length; i++) {
+            if (valArray[i] == null)
+                throw new Exception("Values in Record Value String Array must not be NULL");
+
+            record.put(attributes[i], valArray[i]);
+        }
+        return record;
+    }
+
+    private String[] recordMap2StrArray(Map<String, String> wholeRecord) {
+        String[] values = new String[attributes.length];
+        int index = 0;
+        for(String attr : attributes) {
+            if (wholeRecord.containsKey(attr)) {
+                String tmpVal = null;
+                if ((tmpVal = wholeRecord.get(attr)) != null)
+                    values[index++] = tmpVal;
+                else
+                    throw new RuntimeException("The Record Map Value of Key: " + attr + " must not be NULL");
+            } else {
+                throw new RuntimeException("The Record Map miss Key: " + attr);
+            }
+        }
+        return values;
+    }
+
     public String[] getHeader() {
         return attributes;
     }
 
-    private ArrayList<Map<String, String>> searchInCurrentBuf(CSVDbMapCondition cond, long lineNum) {
-        lock.readLock().lock();
-        ArrayList<Map<String, String>> searchResults = new ArrayList<Map<String, String>>();
-
-        long bufSize = csvLines.size();
-        long range = (lineNum < bufSize) ? lineNum : bufSize;
-        long lineCnt = 0;
-        for (String[] line : csvLines) {
-            HashMap<String, String> record = new HashMap<String, String>();
-            for (int i = 0; i < attributes.length; i++) {
-                String v = "";
-                if (i < line.length)
-                    v = line[i];
-
-                record.put(attributes[i], v);
-            }
-
-            if (cond.meetCondition(record))
-                searchResults.add(record);
-            if(lineCnt++ == range)
-                break;
-        }
-        lock.readLock().unlock();
-        if (searchResults.size() != 0)
-            return searchResults;
-        else
-            return null;
-    }
-
-    private ArrayList<Map<String, String>> searchInCurrentBuf(CSVDbMapCondition cond) {
-        return searchInCurrentBuf(cond, csvLines.size());
-    }
-
-    private ArrayList<Map<String, String>> searchInCurrentBuf(CSVDbArrayCondition cond, long lineNum) {
-        lock.readLock().lock();
-        ArrayList<Map<String, String>> searchResults = new ArrayList<Map<String, String>>();
-
-        long bufSize = csvLines.size();
-        long range = (lineNum < bufSize) ? lineNum : bufSize;
-        long lineCnt = 0;
-        for (String[] line : csvLines) {
-            if (cond.meetCondition(line)) {
-                Map<String, String> record = new HashMap<String, String>();
-                for (int i = 0; i < attributes.length; i++) {
-                    String v = "";
-                    if (i < line.length) {
-                        v = line[i];
+    private long searchInAppendBuf(CSVDbSearchCondition cond, List<Map<String, String>> searchResults) throws Exception {
+        long foundLines = 0;
+        if (appendLines.size() != 0) {
+            lock.readLock().lock();
+            if (cond.arrayCondImplemented()) {
+                for (String[] line : csvLines) {
+                    if (cond.meetCondition(line)) {
+                        searchResults.add(strArray2RecordMap(line));
+                        foundLines++;
                     }
-                    record.put(attributes[i], v);
                 }
-                searchResults.add(record);
+            } else if (cond.mapCondImplemented()) {
+                for (String[] line : csvLines) {
+                    Map<String, String> record = strArray2RecordMap(line);
+
+                    if (cond.meetCondition(record)) {
+                        searchResults.add(record);
+                        foundLines++;
+                    }
+                }
             }
+            lock.readLock().unlock();
+        } else {
+            throw new RuntimeException("At least one meetCondition method in CSVDbCondition must be implemented");
         }
-        lock.readLock().unlock();
-        if (searchResults.size() != 0)
-            return searchResults;
-        else
-            return null;
+        return foundLines;
     }
 
-    private ArrayList<Map<String, String>> searchInCurrentBuf(CSVDbArrayCondition cond) {
-        return searchInCurrentBuf(cond, csvLines.size());
-    }
 
-    private ArrayList<Map<String, String>> searchInCurrentBuf(int attrIndex, String value, long lineNum) {
+
+
+    private long searchInCurrentBuf(CSVDbSearchCondition cond, long lineNum, List<Map<String, String>> searchResults) throws Exception {
+        long lineCnt = 0;
+        long foundLines = 0;
+
         lock.readLock().lock();
-        ArrayList<Map<String, String>> searchResults = new ArrayList<Map<String, String>>();
 
         long bufSize = csvLines.size();
         long range = (lineNum < bufSize) ? lineNum : bufSize;
-        long lineCnt = 0;
-        for (String[] line : csvLines) {
-            if (line[attrIndex].equals(value)) {
-                Map<String, String> curRecord = new HashMap<String, String>();
-                for (int i = 0; i < attributes.length; i++) {
-                    String v = "";
-                    if (i < line.length) {
-                        v = line[i];
-                    }
-                    curRecord.put(attributes[i], v);
+
+        if (cond.arrayCondImplemented()) {
+            for (String[] line : csvLines) {
+                if (cond.meetCondition(line)) {
+                    Map<String, String> record = strArray2RecordMap(line);
+                    searchResults.add(record);
+                    foundLines++;
+                    if (++lineCnt == range)
+                        break;
                 }
-                searchResults.add(curRecord);
             }
-            if (lineCnt++ == range)
-                break;
+        } else if (cond.mapCondImplemented()) {
+            for (String[] line : csvLines) {
+                Map<String, String> record = strArray2RecordMap(line);
+
+                if (cond.meetCondition(record)) {
+                    searchResults.add(record);
+                    foundLines++;
+                }
+                if (++lineCnt == range)
+                    break;
+            }
+        } else {
+            throw new RuntimeException("At least one meetCondition method in CSVDbCondition must be implemented");
         }
 
-        lock.readLock().unlock();
-        if (searchResults.size() != 0)
-            return searchResults;
-        else
-            return null;
+        return foundLines;
     }
 
-    private ArrayList<Map<String, String>> searchInCurrentBuf(int attrIndex, String value) {
-        return searchInCurrentBuf(attrIndex, value, csvLines.size());
+    private long searchInCurrentBuf(CSVDbSearchCondition cond, List<Map<String, String>> searchResults) throws Exception {
+        return searchInCurrentBuf(cond, csvLines.size() ,searchResults);
     }
 
     private long bufferNextRecords (long bufSize) {
+        lock.writeLock().lock();
         bufFirstLineNum += csvLines.size();
         csvLines.clear();
 
@@ -148,10 +163,9 @@ public class CSVFileDatabase {
                 if (!blankLine)
                     csvLines.add(line);
             }
-            else {
-                return i;
-            }
+
         }
+        lock.writeLock().unlock();
         return bufSize;
     }
 
@@ -159,6 +173,48 @@ public class CSVFileDatabase {
         reader.reset();
         csvLines.clear();
         return bufferNextRecords(csvLines.size());
+    }
+
+    public List<Map<String, String>> searchRecord (CSVDbSearchCondition cond) throws IllegalArgumentException {
+        if (cond == null) {
+            throw new IllegalArgumentException("The Condition Parameter must not be NULL");
+        }
+
+        ArrayList<Map<String, String>> resultList = new ArrayList<>();
+        lock.readLock().lock();
+
+        try {
+            if (complete) {
+                searchInCurrentBuf(cond, resultList);
+            } else {
+                long initialBufFirstLineNum = bufFirstLineNum;
+                long readRecordsLines = csvLines.size();
+                do {
+                    searchInCurrentBuf(cond, resultList);
+                } while (readRecordsLines == setBufLen && bufferNextRecords(setBufLen) != 0);
+
+                if (initialBufFirstLineNum != 0) {
+                    bufferRefresh();
+                    long searchedLines = 0;
+                    do {
+                        long bufLines = csvLines.size();
+                        long searchingLines = (searchedLines + bufLines > initialBufFirstLineNum) ? initialBufFirstLineNum - searchedLines : bufLines;
+                        searchInCurrentBuf(cond, searchingLines, resultList);
+
+                        searchedLines += searchingLines;
+                        bufferNextRecords(bufLines);
+                    } while (searchedLines < initialBufFirstLineNum);
+                }
+
+                searchInAppendBuf(cond, resultList);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.exit(-1);
+        }
+
+        lock.readLock().unlock();
+        return resultList;
     }
 
     public List<Map<String, String>> searchRecord (Map<String, String> attrValues) throws IllegalArgumentException {
@@ -169,8 +225,8 @@ public class CSVFileDatabase {
         final int restrictsNum = attrValues.size();
         final int[] attrs = new int[restrictsNum];
         final String[] values = new String[restrictsNum];
-
         int cnt = 0;
+
         for(Map.Entry<String, String> entry : attrValues.entrySet()) {
             String reqAttr = entry.getKey();
             if (reqAttr == null) {
@@ -194,8 +250,14 @@ public class CSVFileDatabase {
             }
         }
 
-        CSVDbArrayCondition cond = new CSVDbArrayCondition() {
-            public boolean meetCondition(String[] record) {
+        CSVDbSearchCondition cond = new CSVDbSearchCondition(CSVDbSearchCondition.ARRAY_RECORD_COND) {
+            @Override
+            boolean meetCondition(Map<String, String> record) {
+                return false;
+            }
+
+            @Override
+            boolean meetCondition(String[] record) {
                 for (int i = 0; i < attrs.length; i++) {
                     if (!record[attrs[i]].equals(values[i]))
                         return false;
@@ -204,44 +266,7 @@ public class CSVFileDatabase {
             }
         };
 
-        lock.readLock().lock();
-        ArrayList<Map<String, String>> searchResults = null;
-
-        if (complete) {
-            searchResults = searchInCurrentBuf(cond);
-        }
-        else {
-            long initialBufFirstLineNum = bufFirstLineNum;
-            long readRecordsCnt = csvLines.size();
-            do {
-                ArrayList<Map<String, String>> bufResults = searchInCurrentBuf(cond);
-                if (bufResults != null) {
-                    for (Map m : bufResults) {
-                        searchResults.add(m);
-                    }
-                }
-            } while (readRecordsCnt == setBufLen && bufferNextRecords(setBufLen) != 0);
-
-            if (initialBufFirstLineNum != 0) {
-                bufferRefresh();
-                long searchedLines = 0;
-                do {
-                    long bufLines = csvLines.size();
-                    long searchingLines = (searchedLines + bufLines > initialBufFirstLineNum) ? initialBufFirstLineNum - searchedLines : bufLines;
-                    ArrayList<Map<String, String>> bufResults = searchInCurrentBuf(cond, searchingLines);
-                    if (bufResults != null) {
-                        for (Map m : bufResults) {
-                            searchResults.add(m);
-                        }
-                    }
-
-                    searchedLines += searchingLines;
-                    bufferNextRecords(bufLines);
-                } while(searchedLines < initialBufFirstLineNum);
-            }
-        }
-        lock.readLock().unlock();
-        return searchResults;
+        return searchRecord(cond);
     }
 
     public List<Map<String, String>> searchRecord (String attr, String value) throws IllegalArgumentException {
@@ -254,86 +279,53 @@ public class CSVFileDatabase {
         if (attrIndex < 0)
             return null;
 
-        lock.readLock().lock();
-        ArrayList<Map<String, String>> searchResults = null;
+        CSVDbSearchCondition cond = new CSVDbSearchCondition(CSVDbSearchCondition.ARRAY_RECORD_COND) {
+            @Override
+            boolean meetCondition(Map<String, String> record) {
+                return false;
+            }
 
-        if (complete) {
-            searchResults = searchInCurrentBuf(attrIndex, value);
-        }
-        else {
-            long initialBufFirstLineNum = bufFirstLineNum;
-            searchResults = searchInCurrentBuf(attrIndex, value);
-
-            final long bufSize = csvLines.size();
-            long bufRecordsNum = 0;
-            while((bufRecordsNum = bufferNextRecords(bufSize)) != 0) {
-                ArrayList<Map<String, String>> bufResults = searchInCurrentBuf(attrIndex, value);
-                if (bufResults != null) {
-                    for (Map m : bufResults) {
-                        searchResults.add(m);
-                    }
+            @Override
+            boolean meetCondition(String[] record) {
+                boolean meet = false;
+                if (record.length == attributes.length) {
+                    meet = record[attrIndex].equals(value);
                 }
-
-                if(bufRecordsNum != bufSize)
-                    break;
+                return meet;
             }
+        };
 
-            if (initialBufFirstLineNum != 0) {
-                bufferRefresh();
-                long searchedLines = 0;
-                do {
-                    long bufLines = csvLines.size();
-                    long searchingLines = (searchedLines + bufLines > initialBufFirstLineNum) ? initialBufFirstLineNum - searchedLines : bufLines;
-                    ArrayList<Map<String, String>> bufResults = searchInCurrentBuf(attrIndex, value, searchingLines);
-                    if (bufResults != null) {
-                        for (Map m : bufResults) {
-                            searchResults.add(m);
-                        }
-                    }
-
-                    searchedLines += searchingLines;
-                    bufferNextRecords(bufLines);
-                } while(searchedLines < initialBufFirstLineNum);
-            }
-        }
-        lock.readLock().unlock();
-        return searchResults;
+        return searchRecord(cond);
     }
 
     public int addRecord(Map<String, String> newRecord) {
-        try {
-            RandomAccessFile raf = new RandomAccessFile(filePath, "rw");
-            long eofPos = raf.length();
-
-            StringBuffer newlineSb = new StringBuffer();
-            raf.seek(eofPos - 2);
-            if ((byte)raf.readChar() != (byte)'\n' ) {
-                newlineSb.append('\n');
-            }
-            raf.seek(eofPos);
-
-            String[] newValues = new String[attributes.length];
-            for(int i = 0; i < attributes.length; i++) {
-                if (!newRecord.containsKey(attributes[i])) {
-                    throw new RuntimeException("The Record Map Parameter is INVALID. There is no key: " + attributes[i]);
+        if (appendLines.size() >= setAppendBufLen) {
+            try {
+                RandomAccessFile raf = new RandomAccessFile(filePath, "rw");
+                long eofPos = raf.length();
+                StringBuffer sb = new StringBuffer();
+                raf.seek(eofPos - 2);
+                if ((byte)raf.readChar() != (byte)'\n' ) {
+                    sb.append('\n');
                 }
-                String s = newRecord.get(attributes[i]);
-                if (s == null)
-                    throw new RuntimeException("The Record Map Parameter is INVALID. The " + attributes[i] + " key's corresponding value is null");
-                else
-                    newValues[i] = s;
-            }
-            String newRecordLine = CSVFileWriter.generateRecord(newValues);
-            newlineSb.append(newRecordLine);
+                raf.seek(eofPos);
 
-            lock.writeLock().lock();
-            raf.write(newlineSb.toString().getBytes("utf8"));
-            lock.writeLock().unlock();
+                for(String[] lineValues : appendLines) {
+                    sb.append(CSVFileWriter.generateRecord(lineValues));
+                }
+
+                lock.writeLock().lock();
+                raf.write(sb.toString().getBytes("utf8"));
+                lock.writeLock().unlock();
+
+            } catch (Exception e) {
+                System.out.println(e.toString());
+                System.exit(-1);
+            }
+            appendLines.clear();
         }
-        catch (Exception e) {
-            System.out.println(e.toString());
-            System.exit(-1);
-        }
+
+        appendLines.add(recordMap2StrArray(newRecord));
         return 0;
     }
 
@@ -359,8 +351,10 @@ public class CSVFileDatabase {
             }
 
             csvLines = new ArrayList<String[]>();
+            appendLines = new ArrayList<String[]>();
 
             setBufLen = recordsBufSize > defaultBufLen ? recordsBufSize : defaultBufLen;
+            setAppendBufLen = defaultAppendBufLen;
             for(long i = 0; i < setBufLen;  i++) {
                 String[] l = reader.readNextLine();
                 if(l != null) {

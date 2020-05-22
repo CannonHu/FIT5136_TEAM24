@@ -7,6 +7,22 @@ public class TestCSV {
 
 
     public static void main(String[] args) throws Exception {
+        UserVerify userVerify = null;
+        String csvDbs[] = {"admin.csv", "coordinate.csv", "candidate.csv"};
+        HashMap<String, String> csvDbMap = new HashMap<>();
+        csvDbMap.put("admin", "admin.csv");
+        csvDbMap.put("coordinate", "coordinate.csv");
+        csvDbMap.put("candidate", "candidate.csv");
+        try {
+            userVerify = new UserVerify(csvDbMap);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("UserVerify init ERROR");
+        }
+
+        System.out.println(userVerify.getUser("RowanHammond"));
+        /*
         String basePath = TestCSV.class.getClassLoader().getResource("").toURI().getPath();
         basePath = basePath.substring(0, basePath.length() - 8);
         String targetDir = "data/user/";
@@ -43,7 +59,7 @@ public class TestCSV {
                 userRecord.put(recordAttrs[2], SHA256.sha256Hash(passwd + staticSalt));
                 usersDb.addRecord(userRecord);
             }
-        }
+        }*/
 
 
 
