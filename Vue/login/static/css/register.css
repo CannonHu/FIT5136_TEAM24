@@ -1,0 +1,21 @@
+#RegisterFrame {
+	width: 55rem;
+	height: 42rem;
+	margin: auto;
+	margin-top: 2rem;
+}
+
+#RegisterFrame, #RegisterFrame .rb-blacken-layer {
+	border-radius: 1.5rem;
+}
+
+.register-info-box {
+	margin-top: 0.8rem;
+	height: 31rem;
+}
+
+@media screen and (max-width: 1080px) {
+	#RegisterFrame:after {
+		background-size: 67.5rem;
+	}
+}

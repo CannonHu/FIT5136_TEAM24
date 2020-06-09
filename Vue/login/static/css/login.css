@@ -1,0 +1,36 @@
+#LoginFrame {
+	width: 48rem;
+	height: 27rem;
+	margin: auto;
+	margin-top: 4rem;
+}
+
+
+#LoginFrame, #LoginFrame .rb-blacken-layer {
+	border-radius: 1.5rem;
+}
+
+.login-info-box {
+	margin-top: 0.8rem;
+}
+
+
+.main-button {
+	width: 9.5rem;
+	height: 2.6rem;
+	font-size: 1.45rem;
+	line-height: 2.6rem;
+	cursor: pointer;
+
+	margin:auto;
+}
+
+.main-button:hover {
+	font-weight: bold;
+}
+
+@media screen and (max-width: 1080px) {
+	#LoginFrame:after {
+		background-size: 67.5rem;
+	}
+}
