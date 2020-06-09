@@ -123,6 +123,10 @@ public class CSVFileWriter {
         }
     }
 
+    public void close() throws IOException {
+        writer.close();
+    }
+
     public CSVFileWriter(String filePath, String[] attributes) throws IllegalArgumentException {
         this(filePath, attributes, true);
     }

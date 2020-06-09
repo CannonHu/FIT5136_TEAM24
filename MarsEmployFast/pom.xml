@@ -96,6 +96,24 @@
           <target>8</target>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>3.1.1</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>copy-dependencies</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <includeScope>system</includeScope>
+          <outputDirectory>${project.build.directory}/WEB-INF/lib</outputDirectory>
+        </configuration>
+      </plugin>
+
     </plugins>
   </build>
 </project>

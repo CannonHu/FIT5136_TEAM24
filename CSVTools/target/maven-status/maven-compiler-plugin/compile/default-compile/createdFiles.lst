@@ -1,7 +1,5 @@
 com\spg\csv\CSVFileDatabase$1.class
-com\spg\csv\CSVDbMapCondition.class
+com\spg\csv\CSVFileDatabase.class
 com\spg\csv\CSVBufferedReader.class
 com\spg\csv\CSVFileReader.class
-com\spg\csv\CSVDbArrayCondition.class
-com\spg\csv\CSVFileDatabase.class
 com\spg\csv\CSVFileWriter.class
